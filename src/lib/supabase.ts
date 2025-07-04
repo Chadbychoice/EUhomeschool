@@ -10,15 +10,40 @@ console.log('🔧 Supabase configuration check:', {
   keyLength: supabaseAnonKey ? `${supabaseAnonKey.length} chars` : 'undefined'
 });
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'your_supabase_project_url' || supabaseAnonKey === 'your_supabase_anon_key') {
   console.error('❌ Missing Supabase environment variables:', {
     VITE_SUPABASE_URL: supabaseUrl || 'undefined',
     VITE_SUPABASE_ANON_KEY: supabaseAnonKey ? '[HIDDEN]' : 'undefined'
   });
-  throw new Error('Missing Supabase environment variables. Please check your .env file.');
+  console.warn('⚠️ Supabase not configured - using mock mode');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Create a mock client if Supabase is not configured
+const createMockSupabaseClient = () => ({
+  from: () => ({
+    select: () => Promise.resolve({ data: [], error: null }),
+    insert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+    update: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+    delete: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+    eq: function() { return this; },
+    single: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+    limit: function() { return this; },
+    order: function() { return this; },
+    ilike: function() { return this; },
+    in: function() { return this; }
+  }),
+  auth: {
+    signInWithPassword: () => Promise.resolve({ data: { user: null }, error: { message: 'Supabase not configured' } }),
+    signUp: () => Promise.resolve({ data: { user: null }, error: { message: 'Supabase not configured' } }),
+    signOut: () => Promise.resolve({ error: null }),
+    getSession: () => Promise.resolve({ data: { session: null } }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
+  }
+});
+
+export const supabase = (!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'your_supabase_project_url' || supabaseAnonKey === 'your_supabase_anon_key') 
+  ? createMockSupabaseClient()
+  : createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -38,7 +63,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 });
 
-console.log('✅ Supabase client initialized successfully');
+console.log((!supabaseUrl || !supabaseAnonKey || supabaseUrl === 'your_supabase_project_url' || supabaseAnonKey === 'your_supabase_anon_key') 
+  ? '⚠️ Supabase client initialized in mock mode' 
+  : '✅ Supabase client initialized successfully');
 
 // Database types
 export interface Database {

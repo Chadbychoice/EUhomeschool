@@ -211,6 +211,9 @@ const CommunityContent: React.FC = () => {
           <div className="text-center py-8 mb-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
             <p className="mt-2 text-neutral-500 dark:text-neutral-400">Connecting to database...</p>
+            <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
+              If this takes too long, check your Supabase configuration
+            </p>
             <button
               onClick={() => setShowDebugger(!showDebugger)}
               className="mt-4 text-sm text-primary-600 dark:text-primary-400 hover:underline"
@@ -224,13 +227,19 @@ const CommunityContent: React.FC = () => {
           <div className="mb-8">
             <div className="bg-error-50 dark:bg-error-900/20 text-error-800 dark:text-error-200 p-6 rounded-lg text-center">
               <h3 className="text-lg font-semibold mb-2">🚨 Connection Failed</h3>
-              <p className="mb-4">Unable to connect to the database. This might be due to:</p>
+              <p className="mb-4">Unable to connect to Supabase. This might be due to:</p>
               <ul className="text-left list-disc list-inside mb-4 max-w-md mx-auto">
                 <li>Missing or incorrect Supabase environment variables</li>
+                <li>Using placeholder values in .env file</li>
                 <li>Internet connection issues</li>
                 <li>Supabase project configuration problems</li>
                 <li>Database server issues</li>
               </ul>
+              <div className="bg-warning-50 dark:bg-warning-900/20 text-warning-800 dark:text-warning-200 p-4 rounded-lg mb-4">
+                <p className="text-sm">
+                  <strong>Quick Fix:</strong> Make sure your <code>.env</code> file contains your actual Supabase project URL and anonymous key, not the placeholder values.
+                </p>
+              </div>
               <div className="space-x-3">
                 <button onClick={handleRetry} className="btn-primary">
                   Try Again

@@ -25,7 +25,7 @@ export const useForum = () => {
         key: supabaseKey ? '✅ Set' : '❌ Missing'
       });
       
-      if (!supabaseUrl || !supabaseKey) {
+      if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
         console.error('❌ Missing Supabase environment variables');
         return false;
       }
@@ -56,6 +56,22 @@ export const useForum = () => {
       setLoading(true);
       setError(null);
 
+      // Check if Supabase is configured
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
+        console.log('📂 Using mock categories data');
+        const mockCategories = [
+          { id: '1', name: 'General Discussion', slug: 'general', description: 'General homeschooling discussions', country_code: null, topic_count: 5, post_count: 23, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+          { id: '2', name: 'Portugal', slug: 'portugal', description: 'Discussions about homeschooling in Portugal', country_code: 'PT', topic_count: 3, post_count: 12, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+          { id: '3', name: 'Ireland', slug: 'ireland', description: 'Discussions about homeschooling in Ireland', country_code: 'IE', topic_count: 2, post_count: 8, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+          { id: '4', name: 'Spain', slug: 'spain', description: 'Discussions about homeschooling in Spain', country_code: 'ES', topic_count: 4, post_count: 15, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+        ];
+        setCategories(mockCategories);
+        setLoading(false);
+        return;
+      }
       console.log('📂 Fetching categories from Supabase...');
       const { data, error } = await supabase
         .from('forum_categories')
@@ -94,6 +110,36 @@ export const useForum = () => {
       setLoading(true);
       setError(null);
       
+      // Check if Supabase is configured
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
+        console.log('💬 Using mock topics data');
+        const mockTopics = [
+          {
+            id: '1',
+            title: 'Welcome to EUhomeschool Community!',
+            content: 'This is a sample topic to demonstrate the forum functionality. Once you configure Supabase, you\'ll be able to create real discussions.',
+            author_id: 'mock-user',
+            category_id: categoryId || '1',
+            is_pinned: true,
+            is_locked: false,
+            view_count: 45,
+            post_count: 3,
+            last_post_at: new Date().toISOString(),
+            last_post_author_id: 'mock-user',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            author: { name: 'Demo User', avatar_url: null },
+            category: { name: 'General Discussion', slug: 'general' },
+            last_post_author: { name: 'Demo User' }
+          }
+        ];
+        setTopics(mockTopics);
+        setLoading(false);
+        return;
+      }
       let query = supabase
         .from('forum_topics')
         .select(`
