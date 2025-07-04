@@ -40,7 +40,7 @@ export const countries: Country[] = [
       'Must follow national curriculum',
       'Limited English resources locally'
     ],
-    headerImage: 'https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg'
+    headerImage: '/countryimages/croatia.webp'
   },
   {
     id: 'greece',
@@ -81,7 +81,7 @@ export const countries: Country[] = [
       'Must follow Greek curriculum',
       'Slower internet in rural areas'
     ],
-    headerImage: 'https://images.pexels.com/photos/1285625/pexels-photo-1285625.jpeg'
+    headerImage: '/countryimages/greece.webp'
   },
   {
     id: 'hungary',
@@ -122,7 +122,7 @@ export const countries: Country[] = [
       'Must follow national curriculum',
       'Hungarian language barrier for non-speakers'
     ],
-    headerImage: 'https://images.pexels.com/photos/1701595/pexels-photo-1701595.jpeg'
+    headerImage: '/countryimages/hungary.webp'
   },
   {
     id: 'romania',
@@ -163,7 +163,7 @@ export const countries: Country[] = [
       'County approval needed',
       'Limited English resources locally'
     ],
-    headerImage: 'https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg'
+    headerImage: '/countryimages/romania.webp'
   },
   {
     id: 'bulgaria',
@@ -204,7 +204,7 @@ export const countries: Country[] = [
       'Must follow Bulgarian curriculum',
       'Smaller international community'
     ],
-    headerImage: 'https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg'
+    headerImage: '/countryimages/bulgaria.webp'
   },
   {
     id: 'estonia',
@@ -245,7 +245,7 @@ export const countries: Country[] = [
       'Annual assessments required',
       'Limited local resources'
     ],
-    headerImage: 'https://images.pexels.com/photos/9816335/pexels-photo-9816335.jpeg'
+    headerImage: '/countryimages/estonia.webp'
   },
   {
     id: 'latvia',
@@ -286,7 +286,7 @@ export const countries: Country[] = [
       'Smaller homeschooling community',
       'Language barriers for non-Latvian speakers'
     ],
-    headerImage: 'https://images.pexels.com/photos/9816335/pexels-photo-9816335.jpeg'
+    headerImage: '/countryimages/latvia.webp'
   },
   {
     id: 'lithuania',
@@ -315,19 +315,19 @@ export const countries: Country[] = [
     internetSpeed: 75,
     communityStrength: 3,
     pros: [
-      'Clear legal framework',
-      'Very affordable cost of living',
-      'Rich historical and cultural resources',
-      'Growing expat community',
-      'EU membership benefits'
+      'Legal framework exists',
+      'Affordable cost of living',
+      'Rich cultural heritage',
+      'Growing international community',
+      'Beautiful natural environment'
     ],
     cons: [
-      'Strict qualification requirements',
-      'Annual examinations mandatory',
-      'Municipal approval needed',
-      'Limited English resources locally'
+      'Bureaucratic approval process',
+      'Regular monitoring required',
+      'Smaller homeschooling community',
+      'Language barriers for non-Lithuanian speakers'
     ],
-    headerImage: 'https://images.pexels.com/photos/9816335/pexels-photo-9816335.jpeg'
+    headerImage: '/countryimages/lithuania.webp'
   },
   {
     id: 'finland',
@@ -368,7 +368,7 @@ export const countries: Country[] = [
       'Finnish language barrier',
       'Annual assessments required'
     ],
-    headerImage: 'https://images.pexels.com/photos/3363341/pexels-photo-3363341.jpeg'
+    headerImage: '/countryimages/finland.webp'
   },
   {
     id: 'france',
@@ -408,7 +408,7 @@ export const countries: Country[] = [
       'Annual renewal required',
       'Need to follow French curriculum standards'
     ],
-    headerImage: 'https://images.pexels.com/photos/1308940/pexels-photo-1308940.jpeg'
+    headerImage: '/countryimages/france.webp'
   },
   {
     id: 'portugal',
@@ -449,7 +449,7 @@ export const countries: Country[] = [
       'Need to align somewhat with Portuguese curriculum',
       'Homeschooling communities concentrated in major cities'
     ],
-    headerImage: 'https://images.pexels.com/photos/2549503/pexels-photo-2549503.jpeg'
+    headerImage: '/countryimages/portugal.webp'
   },
   {
     id: 'ireland',
@@ -490,7 +490,7 @@ export const countries: Country[] = [
       'Housing shortage in major cities',
       'Weather can be challenging for outdoor activities'
     ],
-    headerImage: 'https://images.pexels.com/photos/814499/pexels-photo-814499.jpeg'
+    headerImage: '/countryimages/ireland.webp'
   },
   {
     id: 'spain',
@@ -531,7 +531,7 @@ export const countries: Country[] = [
       'May need to register with umbrella schools',
       'Potential for issues with local authorities'
     ],
-    headerImage: 'https://images.pexels.com/photos/819764/pexels-photo-819764.jpeg'
+    headerImage: '/countryimages/spain.webp'
   },
   {
     id: 'netherlands',
@@ -572,7 +572,7 @@ export const countries: Country[] = [
       'High cost of living',
       'Housing shortage in major cities'
     ],
-    headerImage: 'https://images.pexels.com/photos/1008155/pexels-photo-1008155.jpeg'
+    headerImage: '/countryimages/netherlands.webp'
   },
   {
     id: 'germany',
@@ -602,7 +602,7 @@ export const countries: Country[] = [
       'No legitimate exemptions for philosophical reasons',
       'Many families have had to leave Germany to homeschool'
     ],
-    headerImage: 'https://images.pexels.com/photos/109629/pexels-photo-109629.jpeg'
+    headerImage: '/countryimages/germany.webp'
   },
   {
     id: 'poland',
@@ -643,7 +643,7 @@ export const countries: Country[] = [
       'Limited English resources locally',
       'Bureaucratic registration process'
     ],
-    headerImage: 'https://images.pexels.com/photos/69903/pexels-photo-69903.jpeg'
+    headerImage: '/countryimages/poland.webp'
   },
   {
     id: 'czech-republic',
@@ -684,48 +684,48 @@ export const countries: Country[] = [
       'Must follow national curriculum',
       'Limited flexibility in assessment methods'
     ],
-    headerImage: 'https://images.pexels.com/photos/161401/pexels-photo-161401.jpeg'
+    headerImage: '/countryimages/czech republic.webp'
   },
   {
     id: 'slovakia',
     name: 'Slovakia',
     verdict: 'yellow',
-    rules: 'Homeschooling in Slovakia is legally recognized as "Individual Education" and requires approval from the school director. Parents must have at least secondary education and work with a supervising teacher. Students are required to take examinations at the end of each semester at their registered school. The system is similar to the Czech Republic but with some additional requirements for parent qualifications.',
-    languages: 'Slovak language resources are available through the national education system. International families often supplement with online resources in their preferred language. Bratislava has a particularly active international education community with support for multiple languages. Several online platforms offer curricula in English, German, and other languages commonly used by expatriate families.',
+    rules: 'Homeschooling in Slovakia is legal but requires approval from the school director. Parents must demonstrate their qualifications to teach and submit an educational plan. The education must follow the Slovak national curriculum, and students are required to take annual examinations at a registered school. While the legal framework exists, the approval process can be bureaucratic and varies by school.',
+    languages: 'Slovak educational resources are available through the national system, with growing support for multilingual education. Bratislava and other cities have international communities that share resources in various languages. Many families use a combination of Slovak materials and international online curricula. English, Hungarian, and other European language resources are commonly used.',
     communities: [
       {
-        name: 'Bratislava Home Learners',
+        name: 'Bratislava International Homeschoolers',
         location: 'Bratislava',
-        activities: 'International meetups and educational workshops'
+        activities: 'Multilingual meetups and cultural heritage studies'
       },
       {
-        name: 'Košice Education Circle',
+        name: 'Košice Learning Network',
         location: 'Košice',
-        activities: 'Traditional skills workshops and nature studies'
+        activities: 'Traditional crafts and Slovak history workshops'
       },
       {
-        name: 'Tatra Region Homeschoolers',
-        location: 'High Tatras',
-        activities: 'Mountain ecology studies and outdoor education'
+        name: 'High Tatras Educators',
+        location: 'Poprad',
+        activities: 'Mountain ecology and environmental education'
       }
     ],
     costOfLiving: 1800,
-    internetSpeed: 60,
-    communityStrength: 2,
+    internetSpeed: 70,
+    communityStrength: 3,
     pros: [
-      'Clear legal framework',
-      'Very affordable cost of living',
-      'Beautiful natural environment',
-      'Strong traditional culture',
-      'Central European location'
+      'Legal framework exists',
+      'Affordable cost of living',
+      'Rich cultural heritage',
+      'Beautiful mountain landscapes',
+      'Growing international community'
     ],
     cons: [
-      'Semester examinations required',
-      'Higher parent qualification requirements',
-      'Smaller homeschooling community',
+      'Bureaucratic approval process',
+      'Annual examinations required',
+      'Must follow national curriculum',
       'Limited English resources locally'
     ],
-    headerImage: 'https://images.pexels.com/photos/3363341/pexels-photo-3363341.jpeg'
+    headerImage: '/countryimages/slovakia.webp'
   },
   {
     id: 'italy',
@@ -766,7 +766,7 @@ export const countries: Country[] = [
       'Bureaucratic challenges',
       'Need to demonstrate teaching capacity'
     ],
-    headerImage: 'https://images.pexels.com/photos/1797161/pexels-photo-1797161.jpeg'
+    headerImage: '/countryimages/italy.webp'
   },
   {
     id: 'denmark',
@@ -808,7 +808,7 @@ export const countries: Country[] = [
       'Small homeschooling community',
       'Challenging approval process'
     ],
-    headerImage: 'https://images.pexels.com/photos/2190283/pexels-photo-2190283.jpeg'
+    headerImage: '/countryimages/denmark.webp'
   },
   {
     id: 'sweden',
@@ -850,7 +850,7 @@ export const countries: Country[] = [
       'Many families forced to relocate',
       'No recognition of philosophical reasons'
     ],
-    headerImage: 'https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg'
+    headerImage: '/countryimages/sweden.webp'
   },
   {
     id: 'austria',
@@ -891,7 +891,7 @@ export const countries: Country[] = [
       'Must follow Austrian curriculum',
       'Regional variations in implementation'
     ],
-    headerImage: 'https://images.pexels.com/photos/3363341/pexels-photo-3363341.jpeg'
+    headerImage: '/countryimages/austria.webp'
   },
   {
     id: 'slovenia',
@@ -932,7 +932,7 @@ export const countries: Country[] = [
       'Must follow national curriculum',
       'Limited English resources locally'
     ],
-    headerImage: 'https://images.pexels.com/photos/3363341/pexels-photo-3363341.jpeg'
+    headerImage: '/countryimages/slovenia.webp'
   },
   {
     id: 'liechtenstein',
@@ -969,69 +969,68 @@ export const countries: Country[] = [
       'German language requirement',
       'Bureaucratic approval process'
     ],
-    headerImage: 'https://images.pexels.com/photos/3363341/pexels-photo-3363341.jpeg'
+    headerImage: '/countryimages/liechtenstein.webp'
   },
   {
     id: 'luxembourg',
     name: 'Luxembourg',
     verdict: 'yellow',
-    rules: 'Homeschooling in Luxembourg is legal but requires approval from the Ministry of Education. Parents must submit a detailed educational plan and demonstrate their qualifications to teach. The education must follow Luxembourg\'s multilingual curriculum (Luxembourgish, French, German), and students are required to take annual examinations. The process is bureaucratic but manageable for families who meet the requirements.',
-    languages: 'Luxembourg\'s unique trilingual education system (Luxembourgish, French, German) presents both opportunities and challenges for homeschoolers. Many international families use online curricula in English while incorporating the required local languages. The large expat community in Luxembourg City provides support for various language needs, and there are tutors available for most European languages.',
+    rules: 'Homeschooling in Luxembourg is legal but requires approval from the Ministry of Education. Parents must submit a detailed educational plan and demonstrate their qualifications to teach. The education must follow the Luxembourgish national curriculum, and students are required to take annual examinations. Regular inspections are conducted to ensure compliance.',
+    languages: 'Luxembourg\'s trilingual system (Luxembourgish, French, German) offers diverse educational resources. The international community, particularly in Luxembourg City, has access to resources in many languages. English-language curricula are widely used among expat families, and the presence of EU institutions provides excellent support for multilingual education.',
     communities: [
       {
-        name: 'Luxembourg International Homeschoolers',
+        name: 'Luxembourg City International Homeschoolers',
         location: 'Luxembourg City',
-        activities: 'Multilingual education groups and EU institution visits'
+        activities: 'EU institution visits and multilingual education groups'
       },
       {
         name: 'Esch-sur-Alzette Learning Network',
         location: 'Esch-sur-Alzette',
-        activities: 'Cultural workshops and language exchange programs'
+        activities: 'Industrial heritage studies and cultural workshops'
       }
     ],
-    costOfLiving: 4200,
-    internetSpeed: 110,
+    costOfLiving: 3500,
+    internetSpeed: 85,
     communityStrength: 3,
     pros: [
       'Legal framework exists',
       'Strong international community',
-      'Excellent infrastructure',
       'Multilingual environment',
-      'High standard of living'
+      'EU capital advantages',
+      'Excellent infrastructure'
     ],
     cons: [
       'Very high cost of living',
+      'Annual evaluations required',
       'Complex multilingual requirements',
-      'Bureaucratic approval process',
-      'Annual examinations required',
-      'Limited affordable housing'
+      'Bureaucratic processes'
     ],
-    headerImage: 'https://images.pexels.com/photos/3363341/pexels-photo-3363341.jpeg'
+    headerImage: '/countryimages/luxembourg.webp'
   },
   {
     id: 'malta',
     name: 'Malta',
     verdict: 'yellow',
-    rules: 'Homeschooling in Malta is legal but requires approval from the Ministry of Education. Parents must submit an educational plan and demonstrate their ability to provide quality education equivalent to school standards. Regular monitoring and annual assessments are mandatory. The process involves significant bureaucracy, but Malta\'s English-speaking environment makes it more accessible for international families.',
-    languages: 'Malta offers a unique advantage for English-speaking families, as English is an official language alongside Maltese. Educational resources are readily available in English, and many international online curricula can be used. The strong British educational heritage means UK-based resources are particularly well-suited. Italian language resources are also commonly available due to geographical proximity.',
+    rules: 'Homeschooling in Malta is legal but requires approval from the Ministry of Education. Parents must submit an educational plan and demonstrate their qualifications to teach. The education must follow the Maltese national curriculum, and students are required to take annual examinations. Regular inspections are conducted to ensure compliance with educational standards.',
+    languages: 'Malta offers educational resources in Maltese and English, with strong support for bilingual education. The international community, particularly in Valletta and Sliema, has access to resources in many languages. English-language curricula are widely used, and the country\'s historical connections provide excellent opportunities for cultural education.',
     communities: [
       {
-        name: 'Malta International Homeschoolers',
+        name: 'Valletta International Homeschoolers',
         location: 'Valletta',
-        activities: 'English-language meetups and Mediterranean studies'
+        activities: 'Historical studies and cultural heritage workshops'
       },
       {
-        name: 'Gozo Home Educators',
-        location: 'Victoria (Gozo)',
-        activities: 'Island ecology studies and cultural heritage workshops'
-      },
-      {
-        name: 'Sliema Learning Circle',
+        name: 'Sliema Learning Network',
         location: 'Sliema',
-        activities: 'Maritime education and multilingual activities'
+        activities: 'Mediterranean studies and language exchange programs'
+      },
+      {
+        name: 'Gozo Island Educators',
+        location: 'Victoria',
+        activities: 'Island ecology and traditional crafts workshops'
       }
     ],
-    costOfLiving: 2400,
+    costOfLiving: 2500,
     internetSpeed: 85,
     communityStrength: 3,
     pros: [
@@ -1044,11 +1043,11 @@ export const countries: Country[] = [
     cons: [
       'Bureaucratic approval process',
       'Annual assessments required',
-      'Small island limitations',
+      'Island limitations',
       'Higher cost of living than mainland Europe',
       'Limited local educational resources'
     ],
-    headerImage: 'https://images.pexels.com/photos/1285625/pexels-photo-1285625.jpeg'
+    headerImage: '/countryimages/malta.webp'
   },
   {
     id: 'belgium',
@@ -1090,49 +1089,49 @@ export const countries: Country[] = [
       'Complex multilingual requirements',
       'Bureaucratic processes'
     ],
-    headerImage: 'https://images.pexels.com/photos/1308940/pexels-photo-1308940.jpeg'
+    headerImage: '/countryimages/belgium.webp'
   },
   {
     id: 'cyprus',
     name: 'Cyprus',
     verdict: 'yellow',
-    rules: 'Homeschooling in Cyprus is legal but requires approval from the Ministry of Education. Parents must submit a detailed educational plan and demonstrate their qualifications to teach. The education must follow the Cypriot national curriculum, and students are required to take annual examinations at a registered school. The process is bureaucratic but manageable, especially for families in areas with established expat communities.',
-    languages: 'Cyprus offers excellent resources for English-speaking families due to its British colonial heritage and large expat community. Greek and Turkish educational resources are available depending on the region. Many international families use UK-based curricula, and there\'s strong support for multilingual education. English is widely spoken, making integration easier for international homeschooling families.',
+    rules: 'Homeschooling in Cyprus is legal but requires approval from the Ministry of Education. Parents must submit an educational plan and demonstrate their qualifications to teach. The education must follow the Cypriot national curriculum, and students are required to take annual examinations. Regular inspections are conducted to ensure compliance with educational standards.',
+    languages: 'Cyprus offers educational resources in Greek and English, with strong support for bilingual education. The international community, particularly in Nicosia and coastal cities, has access to resources in many languages. English-language curricula are widely used, and the country\'s historical connections provide excellent opportunities for cultural education.',
     communities: [
       {
         name: 'Nicosia International Homeschoolers',
         location: 'Nicosia',
-        activities: 'Bilingual education groups and cultural workshops'
+        activities: 'Historical studies and cultural heritage workshops'
       },
       {
-        name: 'Limassol Coastal Learners',
+        name: 'Limassol Learning Network',
         location: 'Limassol',
-        activities: 'Mediterranean studies and marine biology programs'
+        activities: 'Mediterranean studies and language exchange programs'
       },
       {
-        name: 'Paphos Heritage Educators',
+        name: 'Paphos Coastal Educators',
         location: 'Paphos',
-        activities: 'Archaeological studies and ancient history explorations'
+        activities: 'Archaeological studies and environmental education'
       }
     ],
     costOfLiving: 2200,
     internetSpeed: 80,
     communityStrength: 3,
     pros: [
-      'English widely spoken',
-      'Strong British expat community',
+      'English-speaking environment',
+      'Legal framework exists',
       'Mediterranean climate',
-      'Affordable cost of living',
+      'Strong expat community',
       'EU membership benefits'
     ],
     cons: [
       'Bureaucratic approval process',
-      'Annual examinations required',
-      'Must follow national curriculum',
-      'Limited local educational resources',
-      'Political division of the island'
+      'Annual assessments required',
+      'Island limitations',
+      'Higher cost of living than mainland Europe',
+      'Limited local educational resources'
     ],
-    headerImage: 'https://images.pexels.com/photos/1285625/pexels-photo-1285625.jpeg'
+    headerImage: '/countryimages/cyprus.webp'
   }
 ];
 

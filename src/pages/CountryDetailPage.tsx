@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Book, Globe, Users, PlusCircle, Check, X } from 'lucide-react';
+import { ArrowLeft, Book, Globe, Users, PlusCircle, Check, X, MessageSquare, Clock, Eye, MessageCircle } from 'lucide-react';
 import { getCountryById } from '../data/countries';
-import { getCommentsByCountry } from '../data/comments';
-import { getStoriesByCountry } from '../data/stories';
-import CommentCard from '../components/shared/CommentCard';
-import StoryCard from '../components/shared/StoryCard';
+import { useForum } from '../hooks/useForum';
 import { motion } from 'framer-motion';
 
 const CountryDetailPage: React.FC = () => {
@@ -15,14 +12,33 @@ const CountryDetailPage: React.FC = () => {
   const [commentContent, setCommentContent] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [commentSubmitted, setCommentSubmitted] = useState(false);
+  const [forumData, setForumData] = useState<{ topics: any[], posts: any[] }>({ topics: [], posts: [] });
+  const [isLoadingForum, setIsLoadingForum] = useState(false);
   
   const country = id ? getCountryById(id) : undefined;
-  const comments = id ? getCommentsByCountry(id) : [];
-  const stories = id ? getStoriesByCountry(id) : [];
+  const { fetchCountryForumData } = useForum();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
+
+  useEffect(() => {
+    const loadForumData = async () => {
+      if (country) {
+        setIsLoadingForum(true);
+        try {
+          const data = await fetchCountryForumData(country.name);
+          setForumData(data);
+        } catch (error) {
+          console.error('Error loading forum data:', error);
+        } finally {
+          setIsLoadingForum(false);
+        }
+      }
+    };
+
+    loadForumData();
+  }, [country, fetchCountryForumData]);
 
   if (!country) {
     return (
@@ -44,15 +60,6 @@ const CountryDetailPage: React.FC = () => {
     }
   };
 
-  const getVerdictClass = (verdict: string) => {
-    switch (verdict) {
-      case 'green': return 'verdict-green';
-      case 'yellow': return 'verdict-yellow';
-      case 'red': return 'verdict-red';
-      default: return '';
-    }
-  };
-
   const getVerdictIcon = (verdict: string) => {
     switch (verdict) {
       case 'green': return <Check className="text-success-600 dark:text-success-400" />;
@@ -62,21 +69,47 @@ const CountryDetailPage: React.FC = () => {
     }
   };
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const getVerdictClass = (verdict: string) => {
+    switch (verdict) {
+      case 'green': return 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800';
+      case 'yellow': return 'bg-warning-50 dark:bg-warning-900/20 border-warning-200 dark:border-warning-800';
+      case 'red': return 'bg-error-50 dark:bg-error-900/20 border-error-200 dark:border-error-800';
+      default: return 'bg-neutral-50 dark:bg-neutral-900/20 border-neutral-200 dark:border-neutral-800';
+    }
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return 'just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    
+    return date.toLocaleDateString();
+  };
+
+  const getDefaultAvatar = (name: string): string => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0ea5e9&color=ffffff&size=80&font-size=0.6`;
+  };
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!commentName.trim() || !commentContent.trim()) return;
+
     setIsSubmittingComment(true);
     
-    // Simulate submission
+    // Simulate API call
     setTimeout(() => {
-      setIsSubmittingComment(false);
       setCommentSubmitted(true);
       setCommentName('');
       setCommentContent('');
+      setIsSubmittingComment(false);
       
-      // Reset after showing success message
-      setTimeout(() => {
-        setCommentSubmitted(false);
-      }, 3000);
+      // Reset success message after 3 seconds
+      setTimeout(() => setCommentSubmitted(false), 3000);
     }, 1000);
   };
 
@@ -118,12 +151,17 @@ const CountryDetailPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Verdict Banner */}
-            <div className={`p-4 rounded-lg mb-6 flex items-center space-x-3 ${getVerdictClass(country.verdict)}`}>
+            <div className={`p-4 rounded-lg mb-6 flex items-center space-x-3 border ${getVerdictClass(country.verdict)}`}>
               <div className="p-2 rounded-full bg-white bg-opacity-20">
                 {getVerdictIcon(country.verdict)}
               </div>
               <div>
-                <span className="font-semibold text-lg">Homeschooling Status: {getVerdictLabel(country.verdict)}</span>
+                <h2 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100">
+                  Homeschooling in {country.name} is {getVerdictLabel(country.verdict).toLowerCase()}
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Based on current regulations and community feedback
+                </p>
               </div>
             </div>
 
@@ -214,34 +252,135 @@ const CountryDetailPage: React.FC = () => {
             </div>
 
             {/* Experience Stories Section */}
-            {stories.length > 0 && (
+            {isLoadingForum ? (
               <div className="mb-12">
                 <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
                   Family Experiences in {country.name}
                 </h3>
-                <div className="space-y-8">
-                  {stories.map(story => (
-                    <StoryCard key={story.id} story={story} />
-                  ))}
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                  <p className="mt-2 text-neutral-500 dark:text-neutral-400">Loading community discussions...</p>
                 </div>
               </div>
-            )}
+            ) : forumData.topics.length > 0 ? (
+              <div className="mb-12">
+                <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
+                  Recent Community Discussions
+                </h3>
+                <div className="space-y-6">
+                  {forumData.topics.map(topic => (
+                    <div key={topic.id} className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6 hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-lg text-neutral-800 dark:text-neutral-100 mb-2">
+                            {topic.title}
+                          </h4>
+                          <p className="text-neutral-600 dark:text-neutral-400 mb-3 line-clamp-3">
+                            {topic.content}
+                          </p>
+                          
+                          <div className="flex items-center space-x-4 text-sm text-neutral-500 dark:text-neutral-400">
+                            <div className="flex items-center space-x-1">
+                              <img
+                                src={topic.author?.avatar_url || getDefaultAvatar(topic.author?.name || 'User')}
+                                alt={topic.author?.name}
+                                className="w-5 h-5 rounded-full"
+                              />
+                              <span>{topic.author?.name}</span>
+                            </div>
+                            
+                            <div className="flex items-center space-x-1">
+                              <Clock size={14} />
+                              <span>{formatTimeAgo(topic.created_at)}</span>
+                            </div>
+                            
+                            <div className="flex items-center space-x-1">
+                              <MessageCircle size={14} />
+                              <span>{topic.post_count || 0} replies</span>
+                            </div>
+                            
+                            <div className="flex items-center space-x-1">
+                              <Eye size={14} />
+                              <span>{topic.view_count || 0} views</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-6 text-center">
+                  <Link 
+                    to="/community" 
+                    className="btn-primary inline-flex items-center space-x-2"
+                  >
+                    <MessageSquare size={18} />
+                    <span>View All Discussions</span>
+                  </Link>
+                </div>
+              </div>
+            ) : null}
 
             {/* Comments Section */}
-            <div className="mb-8">
+            <div className="mb-12">
               <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
                 Community Discussions
               </h3>
 
               <div className="space-y-4 mb-8">
-                {comments.length > 0 ? (
-                  comments.map(comment => (
-                    <CommentCard key={comment.id} comment={comment} />
+                {isLoadingForum ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                    <p className="mt-2 text-neutral-500 dark:text-neutral-400">Loading discussions...</p>
+                  </div>
+                ) : forumData.posts.length > 0 ? (
+                  forumData.posts.slice(0, 5).map(post => (
+                    <div key={post.id} className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
+                      <div className="flex items-start space-x-4">
+                        <img
+                          src={post.author?.avatar_url || getDefaultAvatar(post.author?.name || 'User')}
+                          alt={post.author?.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h5 className="font-semibold text-neutral-800 dark:text-neutral-100">
+                              {post.author?.name}
+                            </h5>
+                            <span className="text-sm text-neutral-500 dark:text-neutral-400">
+                              {formatTimeAgo(post.created_at)}
+                            </span>
+                          </div>
+                          <p className="text-neutral-700 dark:text-neutral-300 mb-2">
+                            {post.content}
+                          </p>
+                          {post.topic && (
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                              In: <span className="font-medium">{post.topic.title}</span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   ))
                 ) : (
-                  <p className="text-neutral-500 dark:text-neutral-400 italic">
-                    No comments yet. Be the first to share your experience!
-                  </p>
+                  <div className="text-center py-8">
+                    <MessageSquare size={48} className="mx-auto text-neutral-400 mb-4" />
+                    <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+                      No discussions yet
+                    </h3>
+                    <p className="text-neutral-500 dark:text-neutral-500 mb-4">
+                      Be the first to start a discussion about homeschooling in {country.name}!
+                    </p>
+                    <Link 
+                      to="/community" 
+                      className="btn-primary inline-flex items-center space-x-2"
+                    >
+                      <MessageSquare size={18} />
+                      <span>Start Discussion</span>
+                    </Link>
+                  </div>
                 )}
               </div>
 
@@ -252,21 +391,25 @@ const CountryDetailPage: React.FC = () => {
                 </h4>
                 
                 {commentSubmitted ? (
-                  <div className="bg-success-50 dark:bg-success-900/20 text-success-800 dark:text-success-200 p-4 rounded-lg mb-4">
-                    Thank you for sharing your experience! Your comment will be reviewed and posted soon.
+                  <div className="bg-success-50 dark:bg-success-900/20 text-success-800 dark:text-success-200 p-4 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Check size={20} />
+                      <span>Thank you for sharing your experience!</span>
+                    </div>
                   </div>
                 ) : (
-                  <form onSubmit={handleCommentSubmit}>
+                  <form onSubmit={handleSubmitComment}>
                     <div className="mb-4">
                       <label htmlFor="name" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
                         Your Name
                       </label>
                       <input
-                        id="name"
                         type="text"
+                        id="name"
                         value={commentName}
                         onChange={(e) => setCommentName(e.target.value)}
-                        className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-700 dark:text-white"
+                        placeholder="Enter your name"
                         required
                       />
                     </div>
@@ -277,21 +420,21 @@ const CountryDetailPage: React.FC = () => {
                       </label>
                       <textarea
                         id="comment"
-                        rows={4}
                         value={commentContent}
                         onChange={(e) => setCommentContent(e.target.value)}
-                        className="w-full px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-700 dark:text-white"
-                        placeholder="Share your experience homeschooling in this country..."
+                        rows={4}
+                        className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-neutral-700 dark:text-white"
+                        placeholder="Share your homeschooling experience in this country..."
                         required
-                      ></textarea>
+                      />
                     </div>
                     
                     <button
                       type="submit"
                       disabled={isSubmittingComment}
-                      className={`btn-primary w-full ${isSubmittingComment ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      className={`btn-primary ${isSubmittingComment ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
-                      {isSubmittingComment ? 'Submitting...' : 'Submit Comment'}
+                      {isSubmittingComment ? 'Submitting...' : 'Share Experience'}
                     </button>
                   </form>
                 )}

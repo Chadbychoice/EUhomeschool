@@ -262,6 +262,78 @@ export const useForum = () => {
     }
   };
 
+  // Fetch topics and posts by country name for country detail pages
+  const fetchCountryForumData = async (countryName: string) => {
+    try {
+      console.log('🌍 Fetching forum data for country:', countryName);
+      setLoading(true);
+      setError(null);
+      
+      // First, find the category for this country
+      const { data: categoryData, error: categoryError } = await supabase
+        .from('forum_categories')
+        .select('*')
+        .ilike('name', `%${countryName}%`)
+        .single();
+
+      if (categoryError) {
+        console.log('⚠️ No category found for country:', countryName);
+        return { topics: [], posts: [] };
+      }
+
+      // Fetch topics for this country
+      const { data: topicsData, error: topicsError } = await supabase
+        .from('forum_topics')
+        .select(`
+          *,
+          author:profiles!forum_topics_author_id_fkey(name, avatar_url),
+          category:forum_categories!forum_topics_category_id_fkey(name, slug),
+          last_post_author:profiles!forum_topics_last_post_author_id_fkey(name)
+        `)
+        .eq('category_id', categoryData.id)
+        .order('is_pinned', { ascending: false })
+        .order('last_post_at', { ascending: false })
+        .limit(5); // Limit to 5 most recent topics for country pages
+
+      if (topicsError) {
+        console.error('❌ Error fetching topics for country:', topicsError);
+        return { topics: [], posts: [] };
+      }
+
+      // Fetch posts for these topics
+      const topicIds = topicsData?.map(topic => topic.id) || [];
+      let postsData: any[] = [];
+      
+      if (topicIds.length > 0) {
+        const { data: posts, error: postsError } = await supabase
+          .from('forum_posts')
+          .select(`
+            *,
+            author:profiles!forum_posts_author_id_fkey(name, avatar_url),
+            topic:forum_topics!forum_posts_topic_id_fkey(title)
+          `)
+          .in('topic_id', topicIds)
+          .order('created_at', { ascending: false })
+          .limit(10); // Limit to 10 most recent posts
+
+        if (!postsError) {
+          postsData = posts || [];
+        }
+      }
+
+      console.log(`✅ Successfully fetched ${topicsData?.length || 0} topics and ${postsData.length} posts for ${countryName}`);
+      return { 
+        topics: topicsData || [], 
+        posts: postsData 
+      };
+    } catch (err) {
+      console.error('❌ Error fetching country forum data:', err);
+      return { topics: [], posts: [] };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     categories,
     topics,
@@ -274,7 +346,7 @@ export const useForum = () => {
     fetchTopic,
     createTopic,
     createPost,
-    setError,
+    fetchCountryForumData,
     testConnection
   };
 };
