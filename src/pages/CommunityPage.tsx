@@ -8,6 +8,7 @@ import { useAuthStore } from '../stores/authStore';
 import { useForum } from '../hooks/useForum';
 import CreateTopicModal from '../components/forum/CreateTopicModal';
 import ConnectionDebugger from '../components/debug/ConnectionDebugger';
+import SupabaseTest from '../components/debug/SupabaseTest';
 import { ForumTopic } from '../lib/supabase';
 
 // Using a polyfill for @headlessui/react Tab component since we can't install it
@@ -237,6 +238,9 @@ const CommunityContent: React.FC = () => {
             {showDebugger && (
               <div className="mt-6">
                 <ConnectionDebugger />
+                <div className="mt-6">
+                  <SupabaseTest />
+                </div>
               </div>
             )}
           </div>
