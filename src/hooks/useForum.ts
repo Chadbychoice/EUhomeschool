@@ -315,6 +315,93 @@ export const useForum = () => {
       setLoading(true);
       setError(null);
       
+      // Check if Supabase is configured
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
+        console.log('🌍 Using mock country forum data for:', countryName);
+        
+        // Return mock data for the specific country
+        const mockTopics = [
+          {
+            id: `mock-topic-${countryName.toLowerCase()}`,
+            title: `Welcome to ${countryName} Homeschooling Community!`,
+            content: `This is a sample discussion topic for ${countryName}. Once you configure Supabase, you'll see real community discussions here.`,
+            author_id: 'mock-user',
+            category_id: 'mock-category',
+            is_pinned: false,
+            is_locked: false,
+            view_count: 25,
+            post_count: 5,
+            last_post_at: new Date().toISOString(),
+            last_post_author_id: 'mock-user',
+            created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+            updated_at: new Date().toISOString(),
+            author: { name: 'Demo User', avatar_url: null },
+            category: { name: countryName, slug: countryName.toLowerCase() },
+            last_post_author: { name: 'Demo User' }
+          },
+          {
+            id: `mock-topic-2-${countryName.toLowerCase()}`,
+            title: `Best Resources for Homeschooling in ${countryName}`,
+            content: `Let's share the best homeschooling resources and curriculum options available in ${countryName}. What has worked well for your family?`,
+            author_id: 'mock-user-2',
+            category_id: 'mock-category',
+            is_pinned: false,
+            is_locked: false,
+            view_count: 18,
+            post_count: 3,
+            last_post_at: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+            last_post_author_id: 'mock-user-2',
+            created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+            updated_at: new Date().toISOString(),
+            author: { name: 'Sarah M.', avatar_url: null },
+            category: { name: countryName, slug: countryName.toLowerCase() },
+            last_post_author: { name: 'Sarah M.' }
+          }
+        ];
+        
+        const mockPosts = [
+          {
+            id: `mock-post-1-${countryName.toLowerCase()}`,
+            content: `We've been homeschooling in ${countryName} for 2 years now and it's been an amazing experience. The local community is very supportive and there are great resources available.`,
+            author_id: 'mock-user',
+            topic_id: `mock-topic-${countryName.toLowerCase()}`,
+            created_at: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+            updated_at: new Date().toISOString(),
+            author: { name: 'Demo User', avatar_url: null },
+            topic: { title: `Welcome to ${countryName} Homeschooling Community!` }
+          },
+          {
+            id: `mock-post-2-${countryName.toLowerCase()}`,
+            content: `I highly recommend checking out the local library system in ${countryName} - they have excellent educational programs and resources for homeschooling families.`,
+            author_id: 'mock-user-2',
+            topic_id: `mock-topic-2-${countryName.toLowerCase()}`,
+            created_at: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
+            updated_at: new Date().toISOString(),
+            author: { name: 'Sarah M.', avatar_url: null },
+            topic: { title: `Best Resources for Homeschooling in ${countryName}` }
+          },
+          {
+            id: `mock-post-3-${countryName.toLowerCase()}`,
+            content: `The registration process in ${countryName} was straightforward. Make sure to have all your documents ready and translated if needed. Happy to help other families with questions!`,
+            author_id: 'mock-user-3',
+            topic_id: `mock-topic-${countryName.toLowerCase()}`,
+            created_at: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
+            updated_at: new Date().toISOString(),
+            author: { name: 'Michael K.', avatar_url: null },
+            topic: { title: `Welcome to ${countryName} Homeschooling Community!` }
+          }
+        ];
+        
+        setLoading(false);
+        return { 
+          topics: mockTopics, 
+          posts: mockPosts 
+        };
+      }
+      
       // First, find the category for this country
       const { data: categoryData, error: categoryError } = await supabase
         .from('forum_categories')
