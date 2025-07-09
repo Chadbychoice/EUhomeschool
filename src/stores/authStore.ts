@@ -41,12 +41,14 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true });
         
         try {
+          console.log('🔐 Attempting login...');
           const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
           });
 
           if (error) {
+            console.log('🔐 Login error:', error.message);
             set({ isLoading: false });
             return { success: false, error: error.message };
           }
@@ -86,6 +88,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true });
         
         try {
+          console.log('🔐 Attempting registration...');
           const { data, error } = await supabase.auth.signUp({
             email: userData.email,
             password: userData.password,
@@ -99,6 +102,7 @@ export const useAuthStore = create<AuthStore>()(
           });
 
           if (error) {
+            console.log('🔐 Registration error:', error.message);
             set({ isLoading: false });
             return { success: false, error: error.message };
           }
@@ -139,11 +143,12 @@ export const useAuthStore = create<AuthStore>()(
 
       logout: async () => {
         try {
+          console.log('🔐 Attempting logout...');
           // Sign out from Supabase
           const { error } = await supabase.auth.signOut();
           
           if (error) {
-            console.error('Logout error:', error);
+            console.log('🔐 Logout error (non-critical):', error);
           }
           
           // Clear the state regardless of Supabase response
@@ -157,7 +162,7 @@ export const useAuthStore = create<AuthStore>()(
           localStorage.removeItem('auth-storage');
           
           // Force a page reload to ensure clean state
-          window.location.href = '/';
+          window.location.reload();
         } catch (error) {
           console.error('Logout error:', error);
           // Still clear local state even if there's an error
@@ -167,7 +172,7 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false
           });
           localStorage.removeItem('auth-storage');
-          window.location.href = '/';
+          window.location.reload();
         }
       },
 
@@ -203,9 +208,11 @@ export const useAuthStore = create<AuthStore>()(
 
       checkAuth: async () => {
         try {
+          console.log('🔐 Checking authentication status...');
           const { data: { session } } = await supabase.auth.getSession();
           
           if (session?.user) {
+            console.log('🔐 Found active session');
             const { data: profile } = await supabase
               .from('profiles')
               .select('*')
@@ -217,10 +224,11 @@ export const useAuthStore = create<AuthStore>()(
               set({ user, isAuthenticated: true });
             }
           } else {
+            console.log('🔐 No active session found');
             set({ user: null, isAuthenticated: false });
           }
         } catch (error) {
-          console.error('Auth check failed:', error);
+          console.log('🔐 Auth check failed (using mock mode):', error);
           set({ user: null, isAuthenticated: false });
         }
       }
@@ -237,6 +245,7 @@ export const useAuthStore = create<AuthStore>()(
 
 // Listen for auth changes
 supabase.auth.onAuthStateChange(async (event, session) => {
+  console.log('🔐 Auth state change:', event);
   const { checkAuth } = useAuthStore.getState();
   
   if (event === 'SIGNED_OUT') {
