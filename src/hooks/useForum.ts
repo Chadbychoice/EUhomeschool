@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase, ForumCategory, ForumTopic, ForumPost } from '../lib/supabase';
+import { supabase, isSupabaseReady, ForumCategory, ForumTopic, ForumPost } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
 
 export const useForum = () => {
@@ -11,19 +11,15 @@ export const useForum = () => {
   
   const { user } = useAuthStore();
 
-  // Fetch categories (simplified - no manual count calculation)
+  // Fetch categories
   const fetchCategories = async () => {
     try {
       console.log('📂 Fetching forum categories...');
       setLoading(true);
       setError(null);
 
-      // Check if Supabase is configured
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      
-      if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
-        console.log('📂 Using mock categories data');
+      if (!isSupabaseReady) {
+        console.log('📂 Using mock categories data (Supabase not configured)');
         const mockCategories = [
           { id: '1', name: 'General Discussion', slug: 'general', description: 'General homeschooling discussions', country_code: null, topic_count: 5, post_count: 23, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
           { id: '2', name: 'Portugal', slug: 'portugal', description: 'Discussions about homeschooling in Portugal', country_code: 'PT', topic_count: 3, post_count: 12, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
@@ -35,37 +31,32 @@ export const useForum = () => {
         return;
       }
 
-      try {
-        console.log('📂 Fetching categories from Supabase...');
-        const { data, error } = await supabase
-          .from('forum_categories')
-          .select('*')
-          .order('name');
+      console.log('📂 Fetching categories from Supabase...');
+      const { data, error } = await supabase
+        .from('forum_categories')
+        .select('*')
+        .order('name');
 
-        if (error) {
-          console.error('❌ Supabase error fetching categories:', error);
-          throw new Error(`Database error: ${error.message}`);
-        }
-        
-        console.log('📂 Raw categories data:', data);
-        
-        if (!data) {
-          console.warn('⚠️ No categories data returned');
-          setCategories([]);
-          return;
-        }
-
-        console.log(`✅ Successfully fetched ${data.length} categories`);
-        setCategories(data);
-      } catch (supabaseError) {
-        console.error('❌ Supabase query failed:', supabaseError);
-        throw supabaseError;
+      if (error) {
+        console.error('❌ Supabase error fetching categories:', error);
+        throw new Error(`Database error: ${error.message}`);
       }
+      
+      console.log('📂 Raw categories data:', data);
+      
+      if (!data) {
+        console.warn('⚠️ No categories data returned');
+        setCategories([]);
+        return;
+      }
+
+      console.log(`✅ Successfully fetched ${data.length} categories`);
+      setCategories(data);
     } catch (err) {
       console.error('❌ Categories fetch error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch categories';
       setError(errorMessage);
-      // Don't clear categories on error - let mock data show
+      // Don't clear categories on error - let mock data show if available
     } finally {
       setLoading(false);
     }
@@ -78,12 +69,8 @@ export const useForum = () => {
       setLoading(true);
       setError(null);
       
-      // Check if Supabase is configured
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      
-      if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
-        console.log('💬 Using mock topics data');
+      if (!isSupabaseReady) {
+        console.log('💬 Using mock topics data (Supabase not configured)');
         const mockTopics = [
           {
             id: '1',
@@ -109,37 +96,32 @@ export const useForum = () => {
         return;
       }
 
-      try {
-        let query = supabase
-          .from('forum_topics')
-          .select(`
-            *,
-            author:profiles!forum_topics_author_id_fkey(name, avatar_url),
-            category:forum_categories!forum_topics_category_id_fkey(name, slug),
-            last_post_author:profiles!forum_topics_last_post_author_id_fkey(name)
-          `)
-          .order('is_pinned', { ascending: false })
-          .order('last_post_at', { ascending: false });
+      let query = supabase
+        .from('forum_topics')
+        .select(`
+          *,
+          author:profiles!forum_topics_author_id_fkey(name, avatar_url),
+          category:forum_categories!forum_topics_category_id_fkey(name, slug),
+          last_post_author:profiles!forum_topics_last_post_author_id_fkey(name)
+        `)
+        .order('is_pinned', { ascending: false })
+        .order('last_post_at', { ascending: false });
 
-        if (categoryId && categoryId !== 'all') {
-          query = query.eq('category_id', categoryId);
-        }
-
-        console.log('💬 Executing topics query...');
-        const { data, error } = await query;
-
-        if (error) {
-          console.error('❌ Supabase error fetching topics:', error);
-          throw new Error(`Database error: ${error.message}`);
-        }
-        
-        console.log('💬 Raw topics data:', data);
-        console.log(`✅ Successfully fetched ${data?.length || 0} topics`);
-        setTopics(data || []);
-      } catch (supabaseError) {
-        console.error('❌ Supabase topics query failed:', supabaseError);
-        throw supabaseError;
+      if (categoryId && categoryId !== 'all') {
+        query = query.eq('category_id', categoryId);
       }
+
+      console.log('💬 Executing topics query...');
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('❌ Supabase error fetching topics:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+      
+      console.log('💬 Raw topics data:', data);
+      console.log(`✅ Successfully fetched ${data?.length || 0} topics`);
+      setTopics(data || []);
     } catch (err) {
       console.error('❌ Topics fetch error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch topics';
@@ -157,28 +139,30 @@ export const useForum = () => {
       setLoading(true);
       setError(null);
       
-      try {
-        const { data, error } = await supabase
-          .from('forum_posts')
-          .select(`
-            *,
-            author:profiles!forum_posts_author_id_fkey(name, avatar_url)
-          `)
-          .eq('topic_id', topicId)
-          .order('created_at', { ascending: true });
-
-        if (error) {
-          console.error('❌ Supabase error fetching posts:', error);
-          throw new Error(`Database error: ${error.message}`);
-        }
-        
-        console.log('📝 Raw posts data:', data);
-        console.log(`✅ Successfully fetched ${data?.length || 0} posts`);
-        setPosts(data || []);
-      } catch (supabaseError) {
-        console.error('❌ Supabase posts query failed:', supabaseError);
-        throw supabaseError;
+      if (!isSupabaseReady) {
+        console.log('📝 Supabase not configured - cannot fetch posts');
+        setPosts([]);
+        setLoading(false);
+        return;
       }
+      
+      const { data, error } = await supabase
+        .from('forum_posts')
+        .select(`
+          *,
+          author:profiles!forum_posts_author_id_fkey(name, avatar_url)
+        `)
+        .eq('topic_id', topicId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('❌ Supabase error fetching posts:', error);
+        throw new Error(`Database error: ${error.message}`);
+      }
+      
+      console.log('📝 Raw posts data:', data);
+      console.log(`✅ Successfully fetched ${data?.length || 0} posts`);
+      setPosts(data || []);
     } catch (err) {
       console.error('❌ Posts fetch error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch posts';
@@ -193,11 +177,7 @@ export const useForum = () => {
   const createTopic = async (title: string, content: string, categoryId: string) => {
     if (!user) throw new Error('Must be logged in to create topics');
     
-    // Check if Supabase is configured
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
+    if (!isSupabaseReady) {
       throw new Error('Forum functionality requires Supabase configuration. Please set up your environment variables.');
     }
 
@@ -233,11 +213,7 @@ export const useForum = () => {
   const createPost = async (content: string, topicId: string) => {
     if (!user) throw new Error('Must be logged in to create posts');
     
-    // Check if Supabase is configured
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
+    if (!isSupabaseReady) {
       throw new Error('Forum functionality requires Supabase configuration. Please set up your environment variables.');
     }
 
@@ -270,11 +246,7 @@ export const useForum = () => {
 
   // Get a single topic with details
   const fetchTopic = async (topicId: string) => {
-    // Check if Supabase is configured
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
+    if (!isSupabaseReady) {
       throw new Error('Forum functionality requires Supabase configuration. Please set up your environment variables.');
     }
     
@@ -318,11 +290,7 @@ export const useForum = () => {
       setLoading(true);
       setError(null);
       
-      // Check if Supabase is configured
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      
-      if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
+      if (!isSupabaseReady) {
         console.log('🌍 Using mock country forum data for:', countryName);
         
         // Return mock data for the specific country
