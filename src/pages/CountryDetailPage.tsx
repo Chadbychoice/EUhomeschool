@@ -15,6 +15,7 @@ const CountryDetailPage: React.FC = () => {
   const [forumData, setForumData] = useState<{ topics: any[], posts: any[] }>({ topics: [], posts: [] });
   const [isLoadingForum, setIsLoadingForum] = useState(false);
   const [forumError, setForumError] = useState<string | null>(null);
+  const [forumDataLoaded, setForumDataLoaded] = useState(false);
   
   const country = id ? getCountryById(id) : undefined;
   const { fetchCountryForumData } = useForum();
@@ -29,13 +30,16 @@ const CountryDetailPage: React.FC = () => {
         console.log('🌍 Loading forum data for country:', country.name);
         setIsLoadingForum(true);
         setForumError(null);
+        setForumDataLoaded(false);
         try {
           const data = await fetchCountryForumData(country.name);
           console.log('🌍 Forum data loaded:', data);
           setForumData(data);
+          setForumDataLoaded(true);
         } catch (error) {
           console.error('🌍 Error loading forum data:', error);
           setForumError(error instanceof Error ? error.message : 'Failed to load forum data');
+          setForumDataLoaded(true);
         } finally {
           setIsLoadingForum(false);
         }
@@ -257,7 +261,7 @@ const CountryDetailPage: React.FC = () => {
             </div>
 
             {/* Experience Stories Section */}
-            {isLoadingForum && (
+            {!forumDataLoaded && isLoadingForum && (
               <div className="mb-12">
                 <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
                   Recent Community Discussions
@@ -269,7 +273,7 @@ const CountryDetailPage: React.FC = () => {
               </div>
             )}
 
-            {!isLoadingForum && forumError && (
+            {forumDataLoaded && forumError && (
               <div className="mb-12">
                 <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
                   Recent Community Discussions
@@ -281,7 +285,7 @@ const CountryDetailPage: React.FC = () => {
               </div>
             )}
 
-            {!isLoadingForum && !forumError && forumData.topics.length > 0 && (
+            {forumDataLoaded && !forumError && forumData.topics.length > 0 && (
               <div className="mb-12">
                 <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
                   Recent Community Discussions
@@ -341,7 +345,7 @@ const CountryDetailPage: React.FC = () => {
               </div>
             )}
 
-            {!isLoadingForum && !forumError && forumData.topics.length === 0 && (
+            {forumDataLoaded && !forumError && forumData.topics.length === 0 && (
               <div className="mb-12">
                 <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
                   Recent Community Discussions
@@ -372,14 +376,14 @@ const CountryDetailPage: React.FC = () => {
               </h3>
 
               <div className="space-y-4 mb-8">
-                {isLoadingForum && (
+                {!forumDataLoaded && isLoadingForum && (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
                     <p className="mt-2 text-neutral-500 dark:text-neutral-400">Loading discussions...</p>
                   </div>
                 )}
 
-                {!isLoadingForum && !forumError && forumData.posts.length > 0 && (
+                {forumDataLoaded && !forumError && forumData.posts.length > 0 && (
                   forumData.posts.slice(0, 5).map(post => (
                     <div key={post.id} className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
                       <div className="flex items-start space-x-4">
@@ -411,7 +415,7 @@ const CountryDetailPage: React.FC = () => {
                   ))
                 )}
 
-                {!isLoadingForum && !forumError && forumData.posts.length === 0 && (
+                {forumDataLoaded && !forumError && forumData.posts.length === 0 && (
                   <div className="text-center py-8">
                     <MessageSquare size={48} className="mx-auto text-neutral-400 mb-4" />
                     <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2">
@@ -430,7 +434,7 @@ const CountryDetailPage: React.FC = () => {
                   </div>
                 )}
 
-                {!isLoadingForum && forumError && (
+                {forumDataLoaded && forumError && (
                   <div className="bg-warning-50 dark:bg-warning-900/20 text-warning-800 dark:text-warning-200 p-6 rounded-lg text-center">
                     <p className="mb-2">Unable to load recent posts</p>
                     <p className="text-sm">{forumError}</p>

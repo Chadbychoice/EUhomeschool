@@ -366,6 +366,10 @@ export const useForum = () => {
         ];
         
         console.log('🌍 Returning mock data for', countryName, '- Topics:', mockTopics.length, 'Posts:', mockPosts.length);
+        
+        // Add a small delay to simulate real loading
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         return { 
           topics: mockTopics, 
           posts: mockPosts 
@@ -378,12 +382,30 @@ export const useForum = () => {
       const { data: categoryData, error: categoryError } = await supabase
         .from('forum_categories')
         .select('*')
-        .ilike('name', `%${countryName}%`)
+        .or(`name.ilike.%${countryName}%,slug.ilike.%${countryName.toLowerCase()}%`)
         .single();
 
       if (categoryError) {
         console.log('⚠️ No category found for country:', countryName, categoryError.message);
-        return { topics: [], posts: [] };
+        
+        // If no exact match, try to find by country code or partial match
+        const { data: allCategories } = await supabase
+          .from('forum_categories')
+          .select('*');
+          
+        const matchingCategory = allCategories?.find(cat => 
+          cat.name.toLowerCase().includes(countryName.toLowerCase()) ||
+          cat.slug.toLowerCase().includes(countryName.toLowerCase())
+        );
+        
+        if (!matchingCategory) {
+          console.log('⚠️ No matching category found for:', countryName);
+          return { topics: [], posts: [] };
+        }
+        
+        console.log('🌍 Found partial match category:', matchingCategory.name);
+        // Use the matching category for the rest of the function
+        categoryData = matchingCategory;
       }
 
       console.log('🌍 Found category for', countryName, ':', categoryData.name);
@@ -404,7 +426,8 @@ export const useForum = () => {
 
       if (topicsError) {
         console.error('❌ Error fetching topics for country:', topicsError);
-        throw new Error(`Failed to fetch topics: ${topicsError.message}`);
+        console.log('⚠️ Using empty topics due to error:', topicsError.message);
+        return { topics: [], posts: [] };
       }
 
       console.log('🌍 Found', topicsData?.length || 0, 'topics for', countryName);
@@ -444,7 +467,8 @@ export const useForum = () => {
       };
     } catch (err) {
       console.error('❌ Error fetching country forum data:', err);
-      throw err; // Re-throw to let the calling component handle the error
+      // Don't throw - return empty data instead to prevent UI errors
+      return { topics: [], posts: [] };
     }
   };
 
