@@ -14,6 +14,7 @@ const CountryDetailPage: React.FC = () => {
   const [commentSubmitted, setCommentSubmitted] = useState(false);
   const [forumData, setForumData] = useState<{ topics: any[], posts: any[] }>({ topics: [], posts: [] });
   const [isLoadingForum, setIsLoadingForum] = useState(false);
+  const [forumError, setForumError] = useState<string | null>(null);
   
   const country = id ? getCountryById(id) : undefined;
   const { fetchCountryForumData } = useForum();
@@ -25,12 +26,16 @@ const CountryDetailPage: React.FC = () => {
   useEffect(() => {
     const loadForumData = async () => {
       if (country) {
+        console.log('🌍 Loading forum data for country:', country.name);
         setIsLoadingForum(true);
+        setForumError(null);
         try {
           const data = await fetchCountryForumData(country.name);
+          console.log('🌍 Forum data loaded:', data);
           setForumData(data);
         } catch (error) {
-          console.error('Error loading forum data:', error);
+          console.error('🌍 Error loading forum data:', error);
+          setForumError(error instanceof Error ? error.message : 'Failed to load forum data');
         } finally {
           setIsLoadingForum(false);
         }
@@ -252,17 +257,31 @@ const CountryDetailPage: React.FC = () => {
             </div>
 
             {/* Experience Stories Section */}
-            {isLoadingForum ? (
+            {isLoadingForum && (
               <div className="mb-12">
                 <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
-                  Family Experiences in {country.name}
+                  Recent Community Discussions
                 </h3>
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
                   <p className="mt-2 text-neutral-500 dark:text-neutral-400">Loading community discussions...</p>
                 </div>
               </div>
-            ) : forumData.topics.length > 0 ? (
+            )}
+
+            {!isLoadingForum && forumError && (
+              <div className="mb-12">
+                <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
+                  Recent Community Discussions
+                </h3>
+                <div className="bg-warning-50 dark:bg-warning-900/20 text-warning-800 dark:text-warning-200 p-6 rounded-lg text-center">
+                  <p className="mb-2">Unable to load community discussions</p>
+                  <p className="text-sm">{forumError}</p>
+                </div>
+              </div>
+            )}
+
+            {!isLoadingForum && !forumError && forumData.topics.length > 0 && (
               <div className="mb-12">
                 <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
                   Recent Community Discussions
@@ -320,7 +339,31 @@ const CountryDetailPage: React.FC = () => {
                   </Link>
                 </div>
               </div>
-            ) : null}
+            )}
+
+            {!isLoadingForum && !forumError && forumData.topics.length === 0 && (
+              <div className="mb-12">
+                <h3 className="text-2xl font-semibold mb-6 font-display text-neutral-800 dark:text-neutral-100">
+                  Recent Community Discussions
+                </h3>
+                <div className="text-center py-12 bg-neutral-50 dark:bg-neutral-800 rounded-lg">
+                  <MessageSquare size={48} className="mx-auto text-neutral-400 mb-4" />
+                  <h4 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+                    No discussions yet for {country.name}
+                  </h4>
+                  <p className="text-neutral-500 dark:text-neutral-500 mb-4">
+                    Be the first to start a discussion about homeschooling in {country.name}!
+                  </p>
+                  <Link 
+                    to="/community" 
+                    className="btn-primary inline-flex items-center space-x-2"
+                  >
+                    <MessageSquare size={18} />
+                    <span>Start Discussion</span>
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* Comments Section */}
             <div className="mb-12">
@@ -329,12 +372,14 @@ const CountryDetailPage: React.FC = () => {
               </h3>
 
               <div className="space-y-4 mb-8">
-                {isLoadingForum ? (
+                {isLoadingForum && (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
                     <p className="mt-2 text-neutral-500 dark:text-neutral-400">Loading discussions...</p>
                   </div>
-                ) : forumData.posts.length > 0 ? (
+                )}
+
+                {!isLoadingForum && !forumError && forumData.posts.length > 0 && (
                   forumData.posts.slice(0, 5).map(post => (
                     <div key={post.id} className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
                       <div className="flex items-start space-x-4">
@@ -364,7 +409,9 @@ const CountryDetailPage: React.FC = () => {
                       </div>
                     </div>
                   ))
-                ) : (
+                )}
+
+                {!isLoadingForum && !forumError && forumData.posts.length === 0 && (
                   <div className="text-center py-8">
                     <MessageSquare size={48} className="mx-auto text-neutral-400 mb-4" />
                     <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2">
@@ -379,6 +426,20 @@ const CountryDetailPage: React.FC = () => {
                     >
                       <MessageSquare size={18} />
                       <span>Start Discussion</span>
+                    </Link>
+                  </div>
+                )}
+
+                {!isLoadingForum && forumError && (
+                  <div className="bg-warning-50 dark:bg-warning-900/20 text-warning-800 dark:text-warning-200 p-6 rounded-lg text-center">
+                    <p className="mb-2">Unable to load recent posts</p>
+                    <p className="text-sm">{forumError}</p>
+                    <Link 
+                      to="/community" 
+                      className="btn-primary inline-flex items-center space-x-2 mt-4"
+                    >
+                      <MessageSquare size={18} />
+                      <span>Visit Community Forum</span>
                     </Link>
                   </div>
                 )}

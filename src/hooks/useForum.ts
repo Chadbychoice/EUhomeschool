@@ -287,7 +287,6 @@ export const useForum = () => {
   const fetchCountryForumData = async (countryName: string) => {
     try {
       console.log('🌍 Fetching forum data for country:', countryName);
-      setLoading(true);
       setError(null);
       
       if (!isSupabaseReady) {
@@ -366,12 +365,14 @@ export const useForum = () => {
           }
         ];
         
-        setLoading(false);
+        console.log('🌍 Returning mock data for', countryName, '- Topics:', mockTopics.length, 'Posts:', mockPosts.length);
         return { 
           topics: mockTopics, 
           posts: mockPosts 
         };
       }
+      
+      console.log('🌍 Fetching real data from Supabase for:', countryName);
       
       // First, find the category for this country
       const { data: categoryData, error: categoryError } = await supabase
@@ -381,9 +382,11 @@ export const useForum = () => {
         .single();
 
       if (categoryError) {
-        console.log('⚠️ No category found for country:', countryName);
+        console.log('⚠️ No category found for country:', countryName, categoryError.message);
         return { topics: [], posts: [] };
       }
+
+      console.log('🌍 Found category for', countryName, ':', categoryData.name);
 
       // Fetch topics for this country
       const { data: topicsData, error: topicsError } = await supabase
@@ -401,14 +404,17 @@ export const useForum = () => {
 
       if (topicsError) {
         console.error('❌ Error fetching topics for country:', topicsError);
-        return { topics: [], posts: [] };
+        throw new Error(`Failed to fetch topics: ${topicsError.message}`);
       }
+
+      console.log('🌍 Found', topicsData?.length || 0, 'topics for', countryName);
 
       // Fetch posts for these topics
       const topicIds = topicsData?.map(topic => topic.id) || [];
       let postsData: any[] = [];
       
       if (topicIds.length > 0) {
+        console.log('🌍 Fetching posts for topic IDs:', topicIds);
         const { data: posts, error: postsError } = await supabase
           .from('forum_posts')
           .select(`
@@ -420,9 +426,15 @@ export const useForum = () => {
           .order('created_at', { ascending: false })
           .limit(10); // Limit to 10 most recent posts
 
-        if (!postsError) {
+        if (postsError) {
+          console.error('❌ Error fetching posts:', postsError);
+          // Don't throw error for posts, just log it
+        } else {
           postsData = posts || [];
+          console.log('🌍 Found', postsData.length, 'posts for', countryName);
         }
+      } else {
+        console.log('🌍 No topics found, so no posts to fetch for', countryName);
       }
 
       console.log(`✅ Successfully fetched ${topicsData?.length || 0} topics and ${postsData.length} posts for ${countryName}`);
@@ -432,9 +444,7 @@ export const useForum = () => {
       };
     } catch (err) {
       console.error('❌ Error fetching country forum data:', err);
-      return { topics: [], posts: [] };
-    } finally {
-      setLoading(false);
+      throw err; // Re-throw to let the calling component handle the error
     }
   };
 
