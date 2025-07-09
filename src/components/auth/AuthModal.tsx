@@ -26,21 +26,29 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // Clear any previous errors and reset state
+    setError('');
 
     try {
       let result;
       
       if (mode === 'login') {
+        console.log('🔐 Starting login process...');
         result = await login(formData.email, formData.password);
       } else {
         if (!formData.name || !formData.currentCountry || !formData.preferredLanguage) {
           setError('Please fill in all fields');
           return;
         }
+        console.log('🔐 Starting registration process...');
         result = await register(formData);
       }
 
+      console.log('🔐 Auth result:', result);
+      
       if (result.success) {
+        console.log('🔐 Auth successful, closing modal...');
         onClose();
         setFormData({
           email: '',
@@ -50,9 +58,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
           preferredLanguage: ''
         });
       } else {
+        console.log('🔐 Auth failed:', result.error);
         setError(result.error || 'An error occurred');
       }
     } catch (err) {
+      console.log('🔐 Auth exception:', err);
       setError('An unexpected error occurred. Please try again.');
     }
   };
