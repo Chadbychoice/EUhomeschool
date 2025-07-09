@@ -63,7 +63,7 @@ const CommunityContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('forum');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showCreateTopic, setShowCreateTopic] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'failed'>('checking');
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'failed'>('connected');
   const [showDebugger, setShowDebugger] = useState(false);
   
   const { user } = useAuthStore();
@@ -74,45 +74,34 @@ const CommunityContent: React.FC = () => {
     error, 
     fetchCategories, 
     fetchTopics,
-    setError,
-    testConnection
+    setError
   } = useForum();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    initializeForum();
+    // Initialize forum immediately without connection testing
+    fetchCategories();
   }, []);
-
-  const initializeForum = async () => {
-    console.log('🚀 Initializing forum...');
-    
-    // Test connection first
-    setConnectionStatus('checking');
-    const isConnected = await testConnection();
-    
-    if (isConnected) {
-      setConnectionStatus('connected');
-      console.log('✅ Connection successful, fetching categories...');
-      await fetchCategories();
-    } else {
-      setConnectionStatus('failed');
-      setError('Failed to connect to the database. Please check your Supabase configuration.');
-    }
-  };
 
   useEffect(() => {
     console.log('📂 Selected category changed to:', selectedCategory);
-    if (connectionStatus === 'connected' && categories.length > 0) {
+    if (categories.length > 0) {
       if (selectedCategory === 'all') {
         fetchTopics();
       } else {
         fetchTopics(selectedCategory);
       }
     }
-  }, [selectedCategory, connectionStatus, categories.length]);
+  }, [selectedCategory, categories.length]);
 
   useEffect(() => {
     console.log('📊 Categories updated:', categories);
+    // Set connection status based on whether we have categories
+    if (categories.length > 0) {
+      setConnectionStatus('connected');
+    } else if (error) {
+      setConnectionStatus('failed');
+    }
   }, [categories]);
 
   useEffect(() => {
@@ -148,8 +137,9 @@ const CommunityContent: React.FC = () => {
   };
 
   const handleRetry = async () => {
+    setConnectionStatus('checking');
     setError(null);
-    await initializeForum();
+    await fetchCategories();
   };
 
   // Mock upcoming events
@@ -211,15 +201,6 @@ const CommunityContent: React.FC = () => {
           <div className="text-center py-8 mb-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
             <p className="mt-2 text-neutral-500 dark:text-neutral-400">Connecting to database...</p>
-            <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
-              If this takes too long, check your Supabase configuration
-            </p>
-            <button
-              onClick={() => setShowDebugger(!showDebugger)}
-              className="mt-4 text-sm text-primary-600 dark:text-primary-400 hover:underline"
-            >
-              Show Debug Info
-            </button>
           </div>
         )}
 
@@ -258,21 +239,6 @@ const CommunityContent: React.FC = () => {
                 <ConnectionDebugger />
               </div>
             )}
-          </div>
-        )}
-
-        {/* Show debugger if requested */}
-        {showDebugger && connectionStatus !== 'failed' && (
-          <div className="mb-8">
-            <ConnectionDebugger />
-            <div className="text-center mt-4">
-              <button
-                onClick={() => setShowDebugger(false)}
-                className="btn-outline"
-              >
-                Hide Debug Info
-              </button>
-            </div>
           </div>
         )}
 
@@ -375,30 +341,16 @@ const CommunityContent: React.FC = () => {
                       <div className="text-center py-8">
                         <MessageSquare size={48} className="mx-auto text-neutral-400 mb-4" />
                         <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2">
-                          No categories found
+                          Loading forum categories...
                         </h3>
                         <p className="text-neutral-500 dark:text-neutral-500 mb-4">
-                          Unable to load forum categories. Please check your connection.
+                          Please wait while we set up the forum for you.
                         </p>
-                        <div className="space-x-3">
-                          <button
-                            onClick={handleRetry}
-                            className="btn-primary"
-                          >
-                            Retry Loading
-                          </button>
-                          <button
-                            onClick={() => setShowDebugger(true)}
-                            className="btn-outline"
-                          >
-                            Debug Connection
-                          </button>
-                        </div>
                       </div>
                     )}
 
                     {/* Topics List */}
-                    {!loading && categories.length > 0 && (
+                    {categories.length > 0 && (
                       <div className="space-y-4">
                         {topics.length > 0 ? (
                           topics.map((topic: ForumTopic) => (

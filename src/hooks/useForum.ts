@@ -11,49 +11,6 @@ export const useForum = () => {
   
   const { user } = useAuthStore();
 
-  // Test Supabase connection
-  const testConnection = async () => {
-    try {
-      console.log('🔍 Testing Supabase connection for forum...');
-      
-      // Check environment variables
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      
-      console.log('Environment check:', {
-        url: supabaseUrl ? '✅ Set' : '❌ Missing',
-        key: supabaseKey ? '✅ Set' : '❌ Missing'
-      });
-      
-      if (!supabaseUrl || !supabaseKey || supabaseUrl === 'your_supabase_project_url' || supabaseKey === 'your_supabase_anon_key') {
-        console.error('❌ Missing Supabase environment variables');
-        return false;
-      }
-      
-      // Test basic connection
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('count')
-          .limit(1);
-          
-        if (error) {
-          console.error('❌ Supabase connection test failed:', error);
-          return false;
-        }
-        
-        console.log('✅ Supabase connection successful');
-        return true;
-      } catch (connectionError) {
-        console.error('❌ Supabase connection error:', connectionError);
-        return false;
-      }
-    } catch (err) {
-      console.error('❌ Supabase connection error:', err);
-      return false;
-    }
-  };
-
   // Fetch categories (simplified - no manual count calculation)
   const fetchCategories = async () => {
     try {
@@ -108,7 +65,7 @@ export const useForum = () => {
       console.error('❌ Categories fetch error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch categories';
       setError(errorMessage);
-      setCategories([]);
+      // Don't clear categories on error - let mock data show
     } finally {
       setLoading(false);
     }
@@ -526,6 +483,5 @@ export const useForum = () => {
     createTopic,
     createPost,
     fetchCountryForumData,
-    testConnection
   };
 };

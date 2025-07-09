@@ -162,7 +162,7 @@ export const useAuthStore = create<AuthStore>()(
           localStorage.removeItem('auth-storage');
           
           // Force a page reload to ensure clean state
-          window.location.reload();
+          setTimeout(() => window.location.reload(), 100);
         } catch (error) {
           console.error('Logout error:', error);
           // Still clear local state even if there's an error
@@ -172,7 +172,7 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false
           });
           localStorage.removeItem('auth-storage');
-          window.location.reload();
+          setTimeout(() => window.location.reload(), 100);
         }
       },
 
