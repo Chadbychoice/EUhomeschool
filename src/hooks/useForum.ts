@@ -379,11 +379,11 @@ export const useForum = () => {
       console.log('🌍 Fetching real data from Supabase for:', countryName);
       
       // First, find the category for this country
-      const { data: categoryData, error: categoryError } = await supabase
+      let categoryData;
+      const { data: categoryResults, error: categoryError } = await supabase
         .from('forum_categories')
         .select('*')
-        .or(`name.ilike.%${countryName}%,slug.ilike.%${countryName.toLowerCase()}%`)
-        .single();
+        .or(`name.ilike.%${countryName}%,slug.ilike.%${countryName.toLowerCase()}%`);
 
       if (categoryError) {
         console.log('⚠️ No category found for country:', countryName, categoryError.message);
@@ -404,8 +404,13 @@ export const useForum = () => {
         }
         
         console.log('🌍 Found partial match category:', matchingCategory.name);
-        // Use the matching category for the rest of the function
         categoryData = matchingCategory;
+      } else if (!categoryResults || categoryResults.length === 0) {
+        console.log('⚠️ No categories returned for:', countryName);
+        return { topics: [], posts: [] };
+      } else {
+        // Use the first matching category
+        categoryData = categoryResults[0];
       }
 
       console.log('🌍 Found category for', countryName, ':', categoryData.name);
